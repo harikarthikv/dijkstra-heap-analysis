@@ -1,7 +1,13 @@
-import time
+"""
+Leftist Heap implementation of Dijkstra's algorithm.
+"""
 
-# Add Leftist Heap class
+from dijkstra import load_graph_from_file, run_dijkstra_benchmark
+
+
 class LeftistHeapNode:
+    """Node in Leftist Heap."""
+    
     def __init__(self, key, vertex):
         self.key = key
         self.vertex = vertex
@@ -9,11 +15,15 @@ class LeftistHeapNode:
         self.right = None
         self.npl = 0  # Null Path Length
 
+
 class LeftistHeap:
+    """Leftist heap for efficient priority queue operations."""
+    
     def __init__(self):
         self.root = None
 
     def merge(self, h1, h2):
+        """Merge two leftist heaps."""
         if not h1:
             return h2
         if not h2:
@@ -27,96 +37,49 @@ class LeftistHeap:
         return h1
 
     def insert(self, key, vertex):
+        """Insert key-vertex pair into heap."""
         new_node = LeftistHeapNode(key, vertex)
         self.root = self.merge(self.root, new_node)
 
-    def remove_min(self):
+    def extract_min(self):
+        """Extract and return minimum element."""
         if not self.root:
             return None
         min_node = self.root
         self.root = self.merge(self.root.left, self.root.right)
         return min_node
 
-# Update Dijkstra function to use Leftist Heap
-def dijkstra(graph, src):
-    num_vertices = graph.num_vertices
-    distances = [float("inf")] * num_vertices
-    distances[src] = 0
 
+if __name__ == "__main__":
+    graph, src = load_graph_from_file(r'dataset/dataset_ip.txt')
+    print("Running Dijkstra with Leftist Heap...")
+    
+    # Custom implementation for Leftist Heap
+    import time
     leftist_heap = LeftistHeap()
-    leftist_heap.insert(0, src)  # Insert the source vertex
-
+    leftist_heap.insert(0, src)
+    
+    INF = float('inf')
+    distances = [INF] * graph.num_vertices
+    distances[src] = 0
+    
+    start_time = time.time()
+    
     while leftist_heap.root:
-        min_node = leftist_heap.remove_min()  # Get the vertex with the minimum distance
+        min_node = leftist_heap.extract_min()
         current_dist, u = min_node.key, min_node.vertex
-        
+
         if current_dist > distances[u]:
             continue
-        
+
         for v, weight in graph.edges[u]:
             if distances[u] + weight < distances[v]:
                 distances[v] = distances[u] + weight
-                leftist_heap.insert(distances[v], v)  # Push updated distance to the Leftist Heap
-
-    return distances
-
-# Graph class
-class Graph:
-    def __init__(self, num_vertices):
-        self.num_vertices = num_vertices
-        self.edges = [[] for _ in range(num_vertices)]  # Adjacency list
-
-    def add_edge(self, u, v, weight):
-        self.edges[u].append((v, weight))  # Add directed edge (u -> v)
-        self.edges[v].append((u, weight))  # If undirected graph, add (v -> u)
-
-# Load graph from file
-def load_graph_from_file(file_path):
-    with open(file_path, 'r') as f:
-        # Read the first line for number of vertices and edges, ignore the second integer
-        num_vertices, _ = map(int, f.readline().strip().split())
-        src = 0  # Define the source vertex (default to 0, or change as needed)
-        
-        graph = Graph(num_vertices)
-
-        # Process each line with 'a' format
-        for line in f:
-            parts = line.strip().split()
-            if parts[0] == 'a':
-                u = int(parts[1]) - 1  # Adjust index if needed (assuming 1-based index in file)
-                v = int(parts[2]) - 1  # Adjust index if needed
-                weight = int(parts[3])
-                graph.add_edge(u, v, weight)
-                
-    return graph, src
-
-# Display distances
-def display_distances(distances, title):
-    print(f"{title}")
-    print("Vertex   Distance from Source")
-    for i, distance in enumerate(distances):
-        print(f"{i}\t\t{distance}")
-
-
-# Load the graph from the file with your specified format
-graph, src = load_graph_from_file(r'dataset/dataset_ip.txt')
-print("Running Dijkstra with Leftist Heap...")
-
-# Measure execution time
-start_time = time.time()  # Start time
-dist_binary = dijkstra(graph, src)  # Run Dijkstra's algorithm
-end_time = time.time()  # End time
-
-# Display the distances from source to each vertex
-
-# Calculate and display the execution time in milliseconds
-execution_time = (end_time - start_time) * 1000  # Convert seconds to milliseconds
-
-# Write the distances and execution time to an output file
-with open(r'dataset/leftist_op.txt', 'w') as f:
-    f.write("Running Dijkstra with Leftist Heap...\n")
-    f.write("Vertex   Distance from Source\n")
-    for i, distance in enumerate(dist_binary):
-        f.write(f"{i}\t\t{distance}\n")
-    f.write(f"Execution time using Leftist Heap: {execution_time:.2f} ms\n")
-print("Output written to leftist_op.txt")
+                leftist_heap.insert(distances[v], v)
+    
+    end_time = time.time()
+    execution_time = (end_time - start_time) * 1000
+    
+    from dijkstra import save_results
+    save_results(distances, execution_time, r'dataset/leftist_op.txt', 'Leftist Heap')
+    print("Output written to leftist_op.txt")

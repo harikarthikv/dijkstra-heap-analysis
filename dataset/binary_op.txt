@@ -1,3 +1,4 @@
+Running Dijkstra with Custom Binary Min-Heap...
 Vertex  Distance from Source
 0		0
 1		803
@@ -264345,4 +264346,4 @@ Vertex  Distance from Source
 264343		322843
 264344		209545
 264345		495306
-Execution time: 3295.86 ms
+Execution time: 1634.24 ms

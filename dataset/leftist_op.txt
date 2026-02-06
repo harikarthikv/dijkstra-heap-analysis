@@ -1,5 +1,5 @@
 Running Dijkstra with Leftist Heap...
-Vertex   Distance from Source
+Vertex  Distance from Source
 0		0
 1		803
 2		50999
@@ -264346,4 +264346,4 @@ Vertex   Distance from Source
 264343		322843
 264344		209545
 264345		495306
-Execution time using Leftist Heap: 3619.65 ms
+Execution time: 1816.91 ms
